@@ -15,3 +15,5 @@ NordicSemiconductor:<a href="https://www.nordicsemi.com/Products/nRF52840">nRF52
 Texas Instrument:<a href="https://www.ti.com/product/DRV8316?keyMatch=DRV8316&tisearch=universal_search&usecase=GPN-ALT">DRV8316</a> <br />
 TDK:<a href="https://product.tdk.com/en/search/sensor/mortion-inertial/imu/info?part_no=ICM-20948">ICM-20948</a><br />
 Analog Devices:<a href="https://www.analog.com/en/products/lt8640.html">LT8640</a> <br />
+**LICENSES**< br />
+NONE
