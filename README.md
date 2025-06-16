@@ -9,11 +9,11 @@ This design is an attempt at building a global team implementing an open source 
 Three file structures are necessary to upload at <a href ="https://jlcpcb.com/" target="_blank">JLCPCB.com<a/> for turn-key manufacturing: gerber/jlcpcb6lry/jlcpcb6lyr.zip, manufacturing/DRVjlc(2)_top_cpl.csv, and manufacturing/DRVjlc(2)_top_bom.csv. This would result in the following model of your new hardware: 
 ![motor drive jlcpcb](/docs/images/jlcII.png)
 **TECHNOLOGIES:**<br />
-GCT: <a href="https://gct.co/connector/usb4110" target="_blank">USBC connector</a> <br />
+GCT: [USBC connector]"https://gct.co/connector/usb4110"<br />
 OnSemi: <a href="https://www.onsemi.com/products/interfaces/usb-type-c/fusb302b" target="_blank">USBC Controller</a><br />
-NordicSemiconductor:<a href="https://www.nordicsemi.com/Products/nRF52840" target="_blank">nRF52840</a> <br />
-Texas Instrument:<a href="https://www.ti.com/product/DRV8316?keyMatch=DRV8316&tisearch=universal_search&usecase=GPN-ALT" target="_blank">DRV8316</a> <br />
-TDK:<a href="https://product.tdk.com/en/search/sensor/mortion-inertial/imu/info?part_no=ICM-20948" target="_blank">ICM-20948</a><br />
-Analog Devices:<a href="https://www.analog.com/en/products/lt8640.html" target="_blank">LT8640</a> <br />
+NordicSemiconductor: <a href="https://www.nordicsemi.com/Products/nRF52840" target="_blank">nRF52840</a> <br />
+Texas Instrument: <a href="https://www.ti.com/product/DRV8316?keyMatch=DRV8316&tisearch=universal_search&usecase=GPN-ALT" target="_blank">DRV8316</a> <br />
+TDK: <a href="https://product.tdk.com/en/search/sensor/mortion-inertial/imu/info?part_no=ICM-20948" target="_blank">ICM-20948</a><br />
+Analog Devices: <a href="https://www.analog.com/en/products/lt8640.html" target="_blank">LT8640</a> <br />
 **LICENSES:**<br />
 NONE
