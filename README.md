@@ -9,9 +9,9 @@ This design is an attempt at building a global team implementing an open source 
 Three file structures are necessary to upload at jlcpcb.com for turn-key manufacturing: gerber/jlcpcb6lry/jlcpcb6lyr.zip, manufacturing/DRVjlc(2)_top_cpl.csv, and manufacturing/DRVjlc(2)_top_bom.csv. This would result in the following model of your new hardware: 
 ![motor drive jlcpcb](/docs/images/jlcII.png)
 **TECHNOLOGIES:**
-GCT: USBC connector
-OnSemiCondudtor: FUSBC302MPXMLP14
-NordicSemiconductor: nRF52840
-Texas Instrument: DRV8316
-TDK: ICM20-948
-Analog Devices: LT8640
+GCT: USBC connector https://gct.co/connector/usb4110<br />
+OnSemiCondudtor: FUSBC302MPXMLP14 https://www.onsemi.com/products/interfaces/usb-type-c/fusb302b<br />
+NordicSemiconductor: nRF52840 https://www.nordicsemi.com/Products/nRF52840<br />
+Texas Instrument: DRV8316 https://www.ti.com/product/DRV8316?keyMatch=DRV8316&tisearch=universal_search&usecase=GPN-ALT<br />
+TDK: ICM-20948 https://product.tdk.com/en/search/sensor/mortion-inertial/imu/info?part_no=ICM-20948<br />
+Analog Devices: LT8640 https://www.analog.com/en/products/lt8640.html<br />
