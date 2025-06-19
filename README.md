@@ -5,10 +5,10 @@
 >Email: cydrollinger@gmail.com
 ![Motor Driver](/docs/images/motorDRVjlc.png)
 **PURPOSE:**<br />
-This design is an attempt at building a global team implementing an open source generic three phase brushless direct current(BLDC) motor driver. The completed hardware design, prototype, adds immediate value to you through turn-key manufacturing at a low price from jlcpcb.com. Future development is necessary in the areas of firmware, software, mechanical, and including hardware technologies to complete a sophisticated electro-mechanical system. This current hardware design with your contributions could leverage the following examples of today's cutting edge technologies: 
+This design is an attempt at building a global team implementing an open source generic three phase brushless direct current(BLDC) motor driver. Transperency is primary allowing anyone access to all bits of the design. The completed hardware design, a prototype, adds immediate value to you through turn-key manufacturing at a low price from jlcpcb.com. Future development is necessary in the areas of firmware, software, mechanical, hardware, and Github repository technologies to complete a sophisticated electro-mechanical system. This current hardware design with your contributions could leverage the following examples of today's cutting edge technologies: 
 <a href="https://hubblenetwork.com/" target="_blank">Hubble Network<a/>, 
 <a href="https://wirepas.com/" target="_blank">WirePas<a/>, and 
-<a href="https://www.zephyrproject.org/" target="_blank">Zephyr RTOS<a/> enabling future technological solutions.    
+<a href="https://www.zephyrproject.org/" target="_blank">Zephyr RTOS<a/> enabling future solutions.    
 Three file structures are necessary to upload at <a href ="https://jlcpcb.com/" target="_blank">JLCPCB.com<a/> for turn-key manufacturing: gerber/jlcpcb6lry/jlcpcb6lyr.zip, manufacturing/DRVjlc(2)_top_cpl.csv, and manufacturing/DRVjlc(2)_top_bom.csv. This would result in the following model of your new hardware: 
 <a href ="/docs/images/jlcII.png" target="_blank">JLCPCB.com Model<a/><br />
 **HARDWARE DESIGN:**
@@ -23,4 +23,4 @@ Texas Instrument: <a href="https://www.ti.com/product/DRV8316?keyMatch=DRV8316&t
 TDK: <a href="https://product.tdk.com/en/search/sensor/mortion-inertial/imu/info?part_no=ICM-20948" target="_blank">ICM-20948</a><br />
 Analog Devices: <a href="https://www.analog.com/en/products/lt8640.html" target="_blank">LT8640</a> <br />
 **LICENSES:**<br />
-NONE
+OPEN
