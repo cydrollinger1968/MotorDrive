@@ -125,6 +125,7 @@ We are committed to fostering an inclusive and respectful community. All contrib
 - **Hardware**:
   - [JLCPCB Manufacturing Guide](https://jlcpcb.com/help/article/81-PCB-Assembly-Service-Instruction)
   - [Eagle Cadsoft](https://drive.google.com/drive/folders/16hUZRvpP8LTodq4CkdMLx0MjbkvIUuqx?usp=drive_link)
+  - Alternatively [KiCad](https://docs.kicad.org/)
 - **Firmware**:
   - [Nordic nRF52840 SDK](https://www.nordicsemi.com/Products/nRF52840)
   - [Zephyr RTOS Documentation](https://docs.zephyrproject.org/)
