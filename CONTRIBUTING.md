@@ -38,7 +38,7 @@ We are committed to fostering an inclusive and respectful community. All contrib
   - Suggest alternative components for cost reduction or supply chain reliability.
   - Validate the design with different motor types or power requirements.
 - **Guidelines**:
-  - Use KiCad for PCB design modifications (source files in `/gerber`).
+  - Use Eagle Cad 7.7 for PCB design modifications (source files in `/gerber`).
   - Ensure compatibility with JLCPCB manufacturing (Gerber, BOM, CPL files).
   - Document changes in `/docs/hardware` with updated schematics and notes.
 
@@ -124,7 +124,7 @@ We are committed to fostering an inclusive and respectful community. All contrib
 ## Resources
 - **Hardware**:
   - [JLCPCB Manufacturing Guide](https://jlcpcb.com/help/article/81-PCB-Assembly-Service-Instruction)
-  - [KiCad Documentation](https://docs.kicad.org/)
+  - [Eagle Cadsoft](https://drive.google.com/drive/folders/16hUZRvpP8LTodq4CkdMLx0MjbkvIUuqx?usp=drive_link)
 - **Firmware**:
   - [Nordic nRF52840 SDK](https://www.nordicsemi.com/Products/nRF52840)
   - [Zephyr RTOS Documentation](https://docs.zephyrproject.org/)
