@@ -2,9 +2,10 @@
 >Design: Motor Driver with Bluetooth 		   
 >Engineer: Cy Drollinger								   
 >Date: 6/25											           
->Email: cydrollinger@gmail.com
-**SCHMATIC:**<br />
+>Email: cydrollinger@gmail.com<br />
+**PURPOSE:**<br />
 Eagle Cadsoft 7v7 complete project in an file architecture possible to plug and play as if the design was created local to the download location. Read CONTRIBUTING.md for access to CAD program.  
+**SCHMATIC:**<br />
 ![Scematic1](../docs/images/schem1.png)
 ![Scematic2](../docs/images/schem2.png)
 **BOARD:**
