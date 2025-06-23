@@ -10,7 +10,7 @@ This design attempts to build global collaboration implementing an open source g
 <a href="https://wirepas.com/" target="_blank">WirePas<a/>, and 
 <a href="https://www.zephyrproject.org/" target="_blank">Zephyr RTOS<a/> enabling future solutions.    
 Three file structures are necessary to upload at <a href ="https://jlcpcb.com/" target="_blank">JLCPCB.com<a/> for turn-key manufacturing:<br /> hardware/manufacturing/gerber/jlcpcb6lry/jlcpcb6lyr.zip, <br />hardware/manufacturing/DRVjlc(2)_top_cpl.csv, and <br />hardware/manufacturing/DRVjlc(2)_top_bom.csv. <br />This would result in the following model of your new hardware: 
-<a href ="/docs/images/jlcII.png" target="_blank">JLCPCB.com Model<a/><br />
+<a href ="/docs/images/jlcII.png" target="_blank">JLCPCB.com Model<a/> ~$60/brd in 2025<br />
 **HARDWARE DESIGN:**
 <br /><a href ="/docs/images/schem1.png" target="_blank">SchematicOne<a/><br />
 <a href ="/docs/images/schem2.png" target="_blank">SchematicTwo<a/><br />
