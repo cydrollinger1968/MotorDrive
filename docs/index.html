@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MotorDrive Insights: Kalman Filters for BLDC Motors</title>
+    <title>MotorDrive Insights: Mastering Kalman Filters for Maxon EC 8 mm BLDC Motors</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DWKNS4DTH8"></script>
@@ -11,12 +11,11 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-DWKNS4DTH8');
     </script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
-        h1, h2 { color: #333; }
+        h1, h2, h3 { color: #333; }
         .cta { background: #f0f0f0; padding: 10px; border-radius: 5px; text-align: center; }
         footer { margin-top: 20px; text-align: center; color: #666; }
     </style>
@@ -79,13 +78,28 @@
     </ul>
     
     <h2>3. State-Space Model and Kalman Filter Setup</h2>
+    <h3>3.1 State Variables</h3>
     <p>Let the state vector be</p>
     $$ x(t) = \begin{bmatrix} \theta(t) \\ \omega(t) \\ i(t) \end{bmatrix}, $$
-    <p>where \( \theta \) [rad] is the estimated rotor angle, \( \omega \) [rad/s] is the angular speed, and \( i \) [A] is the phase or transformed current.</p>
-    <p>For a sampling time \( \Delta t \), the discrete-time model is:</p>
+    <p>where</p>
+    <ul>
+        <li>\( \theta \) [rad] is the estimated rotor angle,</li>
+        <li>\( \omega \) [rad/s] is the angular speed,</li>
+        <li>\( i \) [A] is the phase or transformed current (e.g., in a dq reference frame).</li>
+    </ul>
+    <p>Input \( u(t) \) can be the applied phase voltage (or dq-axis voltages).</p>
+    
+    <h3>3.2 Discrete-Time Approximation</h3>
+    <p>For a sampling time \( \Delta t \), the model converts to:</p>
     $$ x_{k+1} = A x_k + B u_k + w_k, $$
     $$ z_k = H x_k + v_k, $$
-    <p>with \( w_k \) and \( v_k \) as process and measurement noise, and covariances \( Q \) and \( R \).</p>
+    <p>with \( w_k \) and \( v_k \) representing process and measurement noise. Noise covariances \( Q \) and \( R \) define the filter’s trust in the model vs. measurements.</p>
+    
+    <h3>3.3 Measurement Vector</h3>
+    <p>Hall sensors can directly provide coarse rotor angle increments or speed estimates. One approach is to measure:</p>
+    $$ z_k = \begin{bmatrix} \theta_{Hall,k} \\ i_{meas,k} \end{bmatrix}, $$
+    <p>where \( \theta_{Hall,k} \) is extracted from Hall transitions, and \( i_{meas,k} \) is current sensor data. Then</p>
+    $$ H = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix}. $$
     
     <h2>4. Kalman Filter Design Steps</h2>
     <h3>4.1 Predict</h3>
@@ -98,10 +112,50 @@
     $$ P_{k|k} = (I - K_k H) P_{k|k-1}. $$
     
     <h2>5. Filter Tuning and Implementation</h2>
-    <p>Set \( Q \) for load variations, inductance uncertainty, and friction errors. For \( R \), incorporate Hall jitter and current sensor noise (e.g., ±2%). Adjust based on trust in model vs. measurements.</p>
+    <h3>5.1 Process Noise (Q)</h3>
+    <p>Set \( Q \) to account for:</p>
+    <ul>
+        <li>Load torque variations on the motor shaft.</li>
+        <li>Uncertainty in phase inductance/resistance at different temperatures.</li>
+        <li>Rotor friction modeling errors.</li>
+    </ul>
+    
+    <h3>5.2 Measurement Noise (R)</h3>
+    <ul>
+        <li>Hall Sensor Noise: Incorporate the quantization and possible jitter in Hall transitions.</li>
+        <li>Current Sensor Noise: Determine from specifications (e.g., ±2% measurement error).</li>
+        <li>Adjust \( R \) values if the filter either over-trusts or under-trusts measurements.</li>
+    </ul>
+    
+    <h3>5.3 Sampling Time</h3>
+    <p>Because Hall sensors give updates at discrete transitions, the effective sampling rate for the filter can vary with motor speed. A separate high-frequency loop (e.g., > 1 kHz) can integrate and estimate speed. The KF can be updated either every fixed \( \Delta t \) or upon Hall transitions using event-based processing.</p>
+    
+    <h2>6. Practical Considerations</h2>
+    <h3>6.1 Limited Angle Resolution</h3>
+    <p>Hall sensors offer coarse electrical angle increments (e.g., 6 or 12 transitions per electrical revolution). High mechanical speed can result in minimal resolution for advanced, high-precision servo tasks. The Kalman filter helps interpolate or smooth these coarse measurements.</p>
+    
+    <h3>6.2 Nonlinearities</h3>
+    <p>A plain linear KF may still suffice if the operating range is near linear regions. For wider speed/flux range, consider using Extended Kalman Filter (EKF) or Unscented Kalman Filter (UKF) to handle back-EMF nonlinearities.</p>
+    
+    <h3>6.3 Real-Time Constraints</h3>
+    <ul>
+        <li>Embedded microcontrollers must compute the Kalman update in ≈µs–ms timescales.</li>
+        <li>Evaluate memory usage for state covariance matrices and matrix operations.</li>
+    </ul>
+    
+    <h2>7. Example Flowchart</h2>
+    <ol>
+        <li>Initialization: Set \( \hat{x}_{0|0}, P_{0|0}, \) guess \( Q, R \).</li>
+        <li>Motor Voltage Input: Apply \( u_k \) from higher-level controller (e.g., PID or FOC).</li>
+        <li>KF Predict Step: Compute \( \hat{x}_{k|k-1}, P_{k|k-1} \).</li>
+        <li>Measurement Acquisition: Read Hall sensor transitions and current sensor data (forming \( z_k \)).</li>
+        <li>KF Update Step: Calculate \( K_k \), correct state estimate \( \hat{x}_{k|k} \).</li>
+        <li>Feedback to Controller: Use \( (\hat{\theta}, \hat{\omega}, \hat{i})^\top \) in real-time control loop.</li>
+        <li>Repeat: Continue predict–update cycles.</li>
+    </ol>
     
     <h2>8. Conclusion</h2>
-    <p>Designing a Kalman filter for a small-diameter Maxon EC BLDC motor with integrated Hall sensors involves formulating an appropriate state model, accommodating coarse measurements, tuning covariances, and considering real-time constraints. The system provides stable estimates and enhances motor drive performance.</p>
+    <p>Designing a Kalman filter for a small-diameter Maxon EC BLDC motor with integrated Hall sensors involves formulating an appropriate state model (angle, speed, current), accommodating coarse angle measurements from Hall signals, tuning process and measurement noise covariances, and considering real-time constraints. The resultant system provides more stable angle and speed estimates, better utilization of limited Hall sensor resolution, and robust performance under load variations. When properly integrated with a motor controller, the Kalman filter significantly enhances precision and responsiveness of the EC 8 mm motor drive.</p>
     
     <div class="cta">
         <p><strong>Download the Full PDF:</strong> <a href="https://github.com/cydrollinger1968/MotorDrive/raw/main/docs/KalmanMaxEC8.pdf" target="_blank">KalmanMaxEC8.pdf</a></p>
