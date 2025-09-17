@@ -21,7 +21,7 @@
         <div class="section">
             <h2>1. Introduction</h2>
             <p>This report describes a Kalman filter design for estimating and controlling the state of a Maxon EC (Electronically Commutated) brushless DC motor with an 8 mm diameter. This small-diameter motor is often equipped with integrated Hall effect sensors for commutation and basic speed measurement. The high-speed, compact nature of this motor makes reliable state estimation crucial, especially when sensor resolution is limited.</p>
-            <img src="images/kalman_block.png" alt="System Block Diagram">
+            <img src="kalman_block.png" alt="System Block Diagram">
             <ul>
                 <li>Accurate real-time estimation of rotor position and speed.</li>
                 <li>Compensation for noise in Hall sensor signals.</li>
@@ -34,7 +34,7 @@
 
             <h3>2.1 Electrical Model</h3>
             <p>A simplified voltage equation for each phase can be written as:</p>
-            <p>\( V(t) = R i(t) + L \frac{di(t)}{dt} + e_{\text{back}}(t) \)</p>
+           $$ V(t) = R i(t) + L \frac{di(t)}{dt} + e_{back}(t), $$
             <p>where:</p>
             <ul>
                 <li>\( V(t) \) is the phase voltage,</li>
@@ -93,7 +93,6 @@
             <p>\( x_{k+1} = A x_k + B u_k + w_k \)</p>
             <p>\( z_k = H x_k + v_k \)</p>
             <p>with \( w_k \) and \( v_k \) representing process and measurement noise. Noise covariances \( Q \) and \( R \) define the filter’s trust in the model vs. measurements.</p>
-            <img src="images/kalman_block_img_txt.png" alt="System Block Diagram with Equations">
         </div>
 
         <div class="section">
@@ -104,7 +103,7 @@
 
         <div class="section">
             <h2>5. Simulation Results</h2>
-            <img src="images/kalman_outputs.png" alt="Math Model Outputs">
+            <img src="motor_kalman_sim_pwm_three_phase_stabilized.png" alt="Simulation Plots">
             <p>The plots show rotor position, angular velocity, current, Hall sensor outputs, and three-phase PWM average voltages over 2 seconds, validating the Kalman filter's performance.</p>
         </div>
     </div>

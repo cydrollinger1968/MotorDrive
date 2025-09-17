@@ -1,0 +1,35 @@
++--------------------+       +---------------------+       +-------------------+
+| PWM Generation     |       | Park Transform      |       | Plant (Motor)     |
+| (Sine waves ->     |       | (Va, Vb, Vc -> V_q) |       | x_k = A x_{k-1}   |
+| Duty cycles -> PWM | --->  | Uses theta_est      | --->  |     + B V_q + w_k |
+| signals)           |       |                     |       | States: [theta,   |
++--------------------+       +---------------------+       |         omega,    |
+                                       ^                   |         i_q]      |
+                                       |                   +-------------------+
+                                       |                            |
+                                       |                            v
+                                       |                   +-------------------+
+                                       |                   | Measurements      |
+                                       |                   | y_k = H x_k + v_k |
+                                       |                   | (theta + noise?,  |
+                                       |                   |  i_q + noise)     |
+                                       |                   +-------------------+
+                                       |                            |           
+                                       |                            v           
+                                       |                                        
+                                       |                   +-------------------+
+                                       |                   | Update Step       |
+                                       |                   | K = P H' (H P H'  |
+                                       |                   |     + R)^{-1}     |
+                                       |                   | x_hat += K (y_k   |
+                                       |                   |         - H x_hat)|
+                                       |                   | P = (I - K H) P   |
+                                       |                   +-------------------+
+                                       |                            |           
+                                       |                            v           
+                                       |                   +-------------------+
+                                       |                   | Prediction Step   |
+                                        -------------------| x_hat = A x_hat   |
+                                                           |       + B V_q     |
+                                                           | P = A P A' + Q    |
+                                                           +-------------------+

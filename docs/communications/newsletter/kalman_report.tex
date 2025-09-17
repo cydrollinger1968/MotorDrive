@@ -1,0 +1,170 @@
+# Comprehensive Mathematical Verification for Kalman Filter in Maxon EC 8 mm BLDC Motor Control Firmware Development
+
+## Introduction
+
+This document synthesizes information from provided sources—including simulation scripts, block diagrams, design reports, porting guides, and online insights—into a unified reference focused on the mathematical foundations of a Kalman filter for the Maxon EC 8 mm brushless DC (BLDC) motor with Hall sensors. The emphasis is on verification for firmware development, particularly for embedded systems like the nRF52832 microcontroller. Key objectives include accurate state estimation (rotor position, angular velocity, and current), noise compensation, and robust control feedback.
+
+Sources compiled:
+- Octave/MATLAB simulation script (`kalmanPWM.m`).
+- Block diagram LaTeX (`kalman_blockII.tex`).
+- Design report PDF (`KalmanMaxEC8.pdf`).
+- Porting guide PDF (`kalmanPort.pdf`).
+- Simulation plots (image: `motor_kalman_sim_pwm_three_phase_stabilized.png`).
+- Online insights from `https://cydrollinger1968.github.io/MotorDrive/` (MotorDrive Insights newsletter).
+
+The mathematics are verified through simulation results, RMSE calculations, and alignment with firmware implementation steps. All equations are derived from the state-space model, discretized for real-time application.
+
+## Motor Model and Parameters
+
+The motor is modeled electrically and mechanically, with parameters tailored to the Maxon EC 8 mm variant.
+
+### Electrical Model
+Simplified phase voltage equation:
+
+\[ V(t) = R i(t) + L \frac{di(t)}{dt} + e_{\text{back}}(t) \]
+
+Where:
+- \( V(t) \): Phase voltage.
+- \( i(t) \): Phase current.
+- \( R \): Phase resistance (≈5.5 Ω).
+- \( L \): Phase inductance (≈0.2 mH or 0.0002 H in simulation).
+- \( e_{\text{back}}(t) \): Back-EMF, proportional to speed (\( e_{\text{back}} = K_e \omega \), with \( K_e \approx 0.002387 \) V/(rad/s) or ≈2.5 mV/rpm).
+
+### Mechanical Model
+Rotor dynamics:
+
+\[ J \frac{d\omega}{dt} = K_t i(t) - B \omega(t) - \tau_{\text{load}}(t) \]
+
+Where:
+- \( J \): Rotor inertia (≈3 × 10⁻⁷ kg·m²).
+- \( \omega(t) \): Angular velocity (rad/s).
+- \( K_t \): Torque constant (≈0.0024 Nm/A or ≈2.4 mN·m/A).
+- \( B \): Viscous friction (≈2 × 10⁻⁵ N·m·s/rad, adjusted for damping in simulation).
+- \( \tau_{\text{load}}(t) \): Load torque.
+
+These parameters are used in the continuous-time state-space matrices for simulation and discretization.
+
+## State-Space Representation
+
+The state vector is:
+
+\[ x(t) = \begin{bmatrix} \theta(t) \\ \omega(t) \\ i(t) \end{bmatrix} \]
+
+Where:
+- \( \theta(t) \): Rotor angle (rad).
+- \( \omega(t) \): Angular velocity (rad/s).
+- \( i(t) \): q-axis current (A, in dq-frame).
+
+Continuous-time matrices (dq-frame, simplified):
+
+\[ A_{\text{cont}} = \begin{bmatrix} 0 & 1 & 0 \\ 0 & -B/J & K_t/J \\ 0 & -K_e/L & -R/L \end{bmatrix}, \quad B_{\text{cont}} = \begin{bmatrix} 0 \\ 0 \\ 1/L \end{bmatrix} \]
+
+\[ C_{\text{cont}} = I_{3 \times 3}, \quad D_{\text{cont}} = 0 \]
+
+Measurement matrix (for noisy angle and current):
+
+\[ H = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix} \]
+
+Discrete-time approximation (sampling time \( \Delta t = 0.001 \) s, using zero-order hold):
+
+\[ x_{k+1} = A x_k + B u_k + w_k \]
+
+\[ z_k = H x_k + v_k \]
+
+Where:
+- \( A, B \): Discretized from continuous matrices.
+- \( u_k \): Input (q-axis voltage \( V_q \)).
+- \( w_k \sim \mathcal{N}(0, Q) \): Process noise, \( Q = \text{diag}(1 \times 10^{-4}, 1 \times 10^{-2}, 1 \times 10^{-3}) \).
+- \( v_k \sim \mathcal{N}(0, R) \): Measurement noise, \( R = \text{diag}(0.1^2, (0.02 \times 1)^2) \).
+- \( z_k = \begin{bmatrix} \theta_{\text{Hall},k} \\ i_{\text{meas},k} \end{bmatrix} \): Measurements from Hall sensors and current sensor.
+
+Verification: These matrices align with the simulation script, where discretization is performed using `c2d`. In firmware, they are hardcoded for efficiency.
+
+## Kalman Filter Design
+
+The filter estimates \( \hat{x} \) by balancing model predictions and noisy measurements.
+
+### Predict Step
+\[ \hat{x}_{k|k-1} = A \hat{x}_{k-1|k-1} + B u_{k-1} \]
+
+\[ P_{k|k-1} = A P_{k-1|k-1} A^T + Q \]
+
+### Update Step
+\[ K_k = P_{k|k-1} H^T (H P_{k|k-1} H^T + R)^{-1} \]
+
+\[ \hat{x}_{k|k} = \hat{x}_{k|k-1} + K_k (z_k - H \hat{x}_{k|k-1}) \]
+
+\[ P_{k|k} = (I - K_k H) P_{k|k-1} \]
+
+Tuning:
+- \( Q \): Accounts for load variations, inductance uncertainty, friction errors.
+- \( R \): Incorporates Hall jitter (quantization) and current noise (±2%).
+
+Verification: Equations match across sources. For nonlinearities (e.g., wide speed ranges), consider EKF/UKF extensions.
+
+## Block Diagram Description
+
+The system block diagram (from `kalman_blockII.tex`) illustrates signal flow:
+- PWM Generation → Park Transform (\( V_a, V_b, V_c \) to \( V_q \) using \( \theta_{\text{est}} \)) → Plant (Motor, states \( x_k = [\theta, \omega, i_q]^T \)) + Process Noise \( w_k \).
+- Plant → Measurements (\( z_k \), noisy \( \theta, i_q \)) + Measurement Noise \( v_k \) → Kalman Filter (Predict & Update) → \( \theta_{\text{est}} \) feedback to Park Transform.
+
+This verifies the closed-loop integration for firmware, where Hall sensors provide discrete transitions interpolated to continuous \( \theta \).
+
+## Simulation and Verification
+
+The Octave/MATLAB script (`kalmanPWM.m`) simulates the system over 2 seconds:
+- PWM: 1 kHz carrier, 10 Hz sine modulation, 24V supply.
+- Hall sensors: Modeled as binary outputs with jitter.
+- Park transform for \( V_q \): \( V_q = \frac{2}{3} (V_a \cos(\theta_e) + V_b \cos(\theta_e - \frac{2\pi}{3}) + V_c \cos(\theta_e + \frac{2\pi}{3})) \).
+- Loop: Predict/update with Kalman equations.
+
+Plots (from image):
+- Rotor Position: Linear increase from 0 to ~150 rad (true blue, estimated red dashed).
+- Angular Velocity: Oscillates ~20-80 rad/s.
+- Current: Noisy ~0.2-0.8 A.
+- Hall Outputs: Binary steps (green, magenta, yellow).
+- PWM Voltages: Sinusoidal ~5-24 V (red, green, blue).
+- True Rotor Angle: Matches position plot.
+
+RMSE Verification (computed in script):
+- RMSE \( \theta \): 0.080 rad
+- RMSE \( \omega \): 2.824 rad/s
+- RMSE \( i \): 0.016 A
+
+These low errors verify the filter's accuracy in simulation, serving as benchmarks for firmware validation.
+
+## Porting to nRF52832 Firmware
+
+The porting guide (`kalmanPort.pdf`) translates the simulation to C for nRF52832, using nRF5 SDK v15.2.0.
+
+Key Mathematical Alignments:
+- Hardcode \( A, B, H, Q, R \) from discretization.
+- Matrix operations: Custom functions (e.g., multiplication, inversion) for predict/update.
+- Continuous \( \theta \): Map discrete Hall phases (1-6) to angles (0, \( \frac{2\pi}{3} \), etc.).
+- \( V_q \): Computed as in simulation.
+
+Steps include timer interrupts for 1 ms updates, aligning with \( \Delta t \). Verification: Compare firmware outputs to simulation RMSE; optimize for real-time (Cortex-M4F FPU handles floats efficiently).
+
+Additional: Integrate MPU9250 gyro for sensor fusion, extending state model.
+
+## Insights from MotorDrive Website
+
+The website (`https://cydrollinger1968.github.io/MotorDrive/`) mirrors the design report, emphasizing equations for firmware in robotics/drones. It links to `KalmanMaxEC8.pdf` and encourages GitHub contributions. Verification note: Content unverified as of September 9, 2025, but aligns with simulation results.
+
+## Conclusion
+
+This compilation verifies the Kalman filter mathematics through consistent equations, simulation RMSE (low errors indicate robustness), and firmware porting steps. For application development:
+- Use RMSE as benchmarks.
+- Tune \( Q/R \) empirically on hardware.
+- Extend for nonlinearities if needed.
+
+References:
+- Maxon Motor AG datasheets.
+- Kalman (1960), Welch & Bishop (2006).
+
+| Parameter | Value | Source |
+|-----------|-------|--------|
+| R | 5.5 Ω | All sources |
+| L | 0.0002 H | Simulation |
+| K_e | 0.002387 V/(rad/s) | Simulation |
+| RMSE θ | 0.080 rad | Simulation/Porting Guide
