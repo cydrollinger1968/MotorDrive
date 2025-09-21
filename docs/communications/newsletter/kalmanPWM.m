@@ -4,11 +4,11 @@
 pkg load control
 
 % Parameters from document (approximate)
-R = 5.5;          % Ohm (phase resistance)
-L = 0.0002;       % H (phase inductance)
+R = 31.8;          % Ohm (phase resistance)Line 10 correlated to voltage
+L = 0.447;        % H (phase inductance) line 11 correlated to voltage
 Ke_rad = 0.002387; % V/(rad/s) (back-EMF constant)
-Kt = 0.0024;      % Nm/A (torque constant)
-J = 3e-7;         % kg m^2 (rotor inertia)
+Kt = 0.00521;      % Nm/A (torque constant)line 12 correlated to voltage
+J = 3e-6;         % kg m^2 (rotor inertia)
 B = 2e-5;         % Adjusted viscous friction for damping
 
 % Continuous-time state-space matrices (simplified for dq-frame)
