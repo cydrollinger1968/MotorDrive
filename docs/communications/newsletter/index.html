@@ -3,109 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalman Filter for Maxon EC 8mm Brushless DC Motor</title>
+    <title>Kalman Filter for Maxon EC 8mm Motor</title>
+    <!-- Include MathJax for rendering LaTeX equations -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
-        h1 { color: #333; text-align: center; }
-        h2 { color: #555; }
-        p, ul { line-height: 1.6; }
-        .section { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        img { max-width: 100%; height: auto; display: block; margin: 20px auto; }
-        .content { max-width: 800px; margin: 0 auto; }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 40px;
+            max-width: 800px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .equation {
+            margin: 20px 0;
+            text-align: center;
+        }
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="content">
-        <h1>Designing a Kalman Filter for a Maxon EC 8mm Brushless DC Motor with Hall Sensors</h1>
+    <h1>Designing a Kalman Filter for a Maxon EC 8mm Brushless DC Motor with Hall Sensors</h1>
 
-        <div class="section">
-            <h2>1. Introduction</h2>
-            <p>This report describes a Kalman filter design for estimating and controlling the state of a Maxon EC (Electronically Commutated) brushless DC motor with an 8 mm diameter. This small-diameter motor is often equipped with integrated Hall effect sensors for commutation and basic speed measurement. The high-speed, compact nature of this motor makes reliable state estimation crucial, especially when sensor resolution is limited.</p>
-            <img src="kalman_block.png" alt="System Block Diagram">
-            <ul>
-                <li>Accurate real-time estimation of rotor position and speed.</li>
-                <li>Compensation for noise in Hall sensor signals.</li>
-                <li>Robust feedback for motor control loops.</li>
-            </ul>
-        </div>
+    <h2>1. Introduction</h2>
+    <p>This report describes a Kalman filter design for estimating and controlling the state of a Maxon EC (Electronically Commutated) brushless DC motor with an 8 mm diameter. This small-diameter motor is often equipped with integrated Hall effect sensors for commutation and basic speed measurement. The high-speed, compact nature of this motor makes reliable state estimation crucial, especially when sensor resolution is limited.</p>
+    <ul>
+        <li>Accurate real-time estimation of rotor position and speed.</li>
+        <li>Compensation for noise in Hall sensor signals.</li>
+        <li>Robust feedback for motor control loops.</li>
+    </ul>
 
-        <div class="section">
-            <h2>2. Motor and Hall Sensor Characteristics</h2>
+    <h2>2. Motor and Hall Sensor Characteristics</h2>
 
-            <h3>2.1 Electrical Model</h3>
-            <p>A simplified voltage equation for each phase can be written as:</p>
-           $$ V(t) = R i(t) + L \frac{di(t)}{dt} + e_{back}(t), $$
-            <p>where:</p>
-            <ul>
-                <li>\( V(t) \) is the phase voltage,</li>
-                <li>\( i(t) \) is the phase current,</li>
-                <li>\( R \) and \( L \) are the phase resistance and inductance,</li>
-                <li>\( e_{\text{back}}(t) \) is the back-EMF voltage proportional to rotor speed.</li>
-            </ul>
-            <p>Typical Values (Approximate):</p>
-            <ul>
-                <li>\( R \approx 5.5 \, \Omega \),</li>
-                <li>\( L \approx 0.2 \, \text{mH} \),</li>
-                <li>Back-EMF constant \( K_e \approx 2.5 \, \text{mV/rpm} \),</li>
-                <li>Torque constant \( K_t \approx 2.4 \, \text{mN·m/A} \).</li>
-            </ul>
-
-            <h3>2.2 Mechanical Model</h3>
-            <p>The motor’s rotor dynamics:</p>
-            <p>\( J \frac{d\omega}{dt} = K_t i(t) - B \omega(t) - \tau_{\text{load}}(t) \)</p>
-            <p>where:</p>
-            <ul>
-                <li>\( J \) is the rotor inertia,</li>
-                <li>\( \omega(t) \) is the angular velocity,</li>
-                <li>\( B \) is the viscous friction coefficient,</li>
-                <li>\( \tau_{\text{load}}(t) \) is the load torque.</li>
-            </ul>
-            <p>Typical Values:</p>
-            <ul>
-                <li>\( J \approx 3 \times 10^{-7} \, \text{kg·m}^2 \) (small rotor inertia for 8 mm motor),</li>
-                <li>\( B \approx 1 \times 10^{-5} \, \text{N·m·s/rad} \) (estimated).</li>
-            </ul>
-
-            <h3>2.3 Hall Effect Sensors</h3>
-            <ul>
-                <li>Resolution: Typically 1–3 Hall sensors yield 6 or more electrical transitions per electrical revolution (commutation signals).</li>
-                <li>Noise/Uncertainty: Mechanical tolerances can cause jitter or phase error in Hall signals.</li>
-                <li>Measurement Rate: Hall transitions may be measured at microcontroller interrupt level. The motor speed must be inferred from time between transitions.</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>3. State-Space Model and Kalman Filter Setup</h2>
-
-            <h3>3.1 State Variables</h3>
-            <p>Let the state vector be:</p>
-            <p>\( x(t) = \begin{bmatrix} \theta(t) \\ \omega(t) \\ i(t) \end{bmatrix} \)</p>
-            <p>where:</p>
-            <ul>
-                <li>\( \theta \) [rad] is the estimated rotor angle,</li>
-                <li>\( \omega \) [rad/s] is the angular speed,</li>
-                <li>\( i \) [A] is the phase or transformed current (e.g., in a dq reference frame).</li>
-            </ul>
-            <p>Input \( u(t) \) can be the applied phase voltage (or dq-axis voltages).</p>
-
-            <h3>3.2 Discrete-Time Approximation</h3>
-            <p>For a sampling time \( \Delta t \), the model converts to:</p>
-            <p>\( x_{k+1} = A x_k + B u_k + w_k \)</p>
-            <p>\( z_k = H x_k + v_k \)</p>
-            <p>with \( w_k \) and \( v_k \) representing process and measurement noise. Noise covariances \( Q \) and \( R \) define the filter’s trust in the model vs. measurements.</p>
-        </div>
-
-        <div class="section">
-            <h2>4. Porting Kalman Filter Simulation to nRF52832</h2>
-            <p><strong>Date:</strong> September 16, 2025</p>
-            <p>Porting the Kalman filter simulation from MATLAB/Octave to the nRF52832 for the Maxon Motor Driver is feasible with effort due to differences in environment, hardware constraints, and real-time requirements.</p>
-        </div>
-
-        <div class="section">
-            <h2>5. Simulation Results</h2>
-            <img src="motor_kalman_sim_pwm_three_phase_stabilized.png" alt="Simulation Plots">
-            <p>The plots show rotor position, angular velocity, current, Hall sensor outputs, and three-phase PWM average voltages over 2 seconds, validating the Kalman filter's performance.</p>
-        </div>
+    <h3>2.1 Electrical Model</h3>
+    <p>A simplified voltage equation for each phase can be written as:</p>
+    <div class="equation">
+        \( V(t) = R i(t) + L \frac{di(t)}{dt} + e_{\text{back}}(t) \)
     </div>
+    <p>where:</p>
+    <ul>
+        <li>\( V(t) \): phase voltage,</li>
+        <li>\( i(t) \): phase current,</li>
+        <li>\( R, L \): phase resistance and inductance,</li>
+        <li>\( e_{\text{back}}(t) \): back-EMF voltage proportional to rotor speed.</li>
+    </ul>
+    <p>Typical Values (Approximate):</p>
+    <ul>
+        <li>\( R \approx 5.5 \, \Omega \),</li>
+        <li>\( L \approx 0.2 \, \text{mH} \),</li>
+        <li>Back-EMF constant \( K_e \approx 2.5 \, \text{mV/rpm} \),</li>
+        <li>Torque constant \( K_t \approx 2.4 \, \text{mN·m/A} \).</li>
+    </ul>
+
+    <h3>2.2 Mechanical Model</h3>
+    <p>The motor’s rotor dynamics:</p>
+    <div class="equation">
+        \( J \frac{d\omega}{dt} = K_t i(t) - B \omega(t) - \tau_{\text{load}}(t) \)
+    </div>
+    <p>where:</p>
+    <ul>
+        <li>\( J \): rotor inertia,</li>
+        <li>\( \omega(t) \): angular velocity,</li>
+        <li>\( B \): viscous friction coefficient,</li>
+        <li>\( \tau_{\text{load}}(t) \): load torque.</li>
+    </ul>
+    <p>Typical Values:</p>
+    <ul>
+        <li>\( J \approx 3 \times 10^{-7} \, \text{kg·m}^2 \) (small rotor inertia for 8 mm motor),</li>
+        <li>\( B \approx 1 \times 10^{-5} \, \text{N·m·s/rad} \) (estimated).</li>
+    </ul>
+
+    <h3>2.3 Hall Effect Sensors</h3>
+    <ul>
+        <li><strong>Resolution:</strong> Typically 1–3 Hall sensors yield 6 or more electrical transitions per electrical revolution (commutation signals).</li>
+        <li><strong>Noise/Uncertainty:</strong> Mechanical tolerances can cause jitter or phase error in Hall signals.</li>
+        <li><strong>Measurement Rate:</strong> Hall transitions may be measured at microcontroller interrupt level. The motor speed must be inferred from time between transitions.</li>
+    </ul>
+
+    <h2>3. State-Space Model and Kalman Filter Setup</h2>
+
+    <h3>3.1 State Variables</h3>
+    <p>Let the state vector be:</p>
+    <div class="equation">
+        \( x(t) = \begin{bmatrix} \theta(t) \\ \omega(t) \\ i(t) \end{bmatrix} \)
+    </div>
+    <p>where:</p>
+    <ul>
+        <li>\( \theta \) [rad]: estimated rotor angle,</li>
+        <li>\( \omega \) [rad/s]: angular speed,</li>
+        <li>\( i \) [A]: phase or transformed current (e.g., in a dq reference frame).</li>
+    </ul>
+    <p>Input \( u(t) \) can be the applied phase voltage (or dq-axis voltages).</p>
+
+    <h3>3.2 Discrete-Time Approximation</h3>
+    <p>For a sampling time \( \Delta t \), the model converts to:</p>
+    <div class="equation">
+        \( x_{k+1} = A x_k + B u_k + w_k \)
+    </div>
+    <div class="equation">
+        \( z_k = H x_k + v_k \)
+    </div>
+    <p>with \( w_k \) and \( v_k \) representing process and measurement noise. Noise covariances \( Q \) and \( R \) define the filter’s trust in the model vs. measurements.</p>
+
+    <h2>4. Porting Kalman Filter Simulation to nRF52832</h2>
+    <p><strong>Date:</strong> September 16, 2025</p>
+    <p>Porting the Kalman filter simulation from MATLAB/Octave to the nRF52832 for the Maxon Motor Driver is feasible with effort due to differences in environment, hardware constraints, and real-time requirements.</p>
+
+    <h2>5. Simulation Results</h2>
+    <p>The plots show rotor position, angular velocity, current, Hall sensor outputs, and three-phase PWM average voltages over 2 seconds, validating the Kalman filter's performance.</p>
+
 </body>
 </html>
