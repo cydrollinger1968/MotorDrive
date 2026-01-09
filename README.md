@@ -4,6 +4,9 @@
 >Date: 6/25											           
 >Email: cydrollinger@gmail.com
 ![Motor Driver](/docs/images/motorDRVjlc.png)
+
+# DONATE:  [![Donate](https://img.shields.io/badge/Donate-PayPal-green?logo=paypal)](https://www.paypal.com/ncp/payment/3WAJ9SZDAT7B6)
+
 **PURPOSE:**<br />
 This design attempts to build global collaboration implementing an open source generic three phase brushless direct current(BLDC) motor driver. Transparency is primary and allows anyone access to every bit of design. The completed hardware design, a prototype, adds immediate value to you through low price turn-key manufacturing at jlcpcb.com. Future development is necessary in the areas of firmware, software, mechanical, hardware, and Github repository technologies to complete a sophisticated but transparnet electro-mechanical system. Business accumen and finanacial funding are additional resources accelerating this projects timeline. This current hardware design with your contributions could leverage the following examples of today's cutting edge technologies: 
 <a href="https://hubblenetwork.com/" target="_blank">Hubble Network<a/>, 
